@@ -1,0 +1,12 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+irDetectleft  VAR   Bit
+
+DO
+  FREQOUT 8, 1, 38500
+  irDetectLeft = IN9
+
+  DEBUG HOME, "irDetectLeft = ", BIN1 irDetectLeft
+  PAUSE 100
+LOOP

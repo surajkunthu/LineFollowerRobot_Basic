@@ -1,0 +1,69 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+DEBUG "Program Running!"
+
+'Variable
+
+irDetectleft   VAR   Bit
+irDetectRight  VAR   Bit
+pulseCount     VAR   Byte
+
+' Initialization
+
+FREQOUT 4, 2000, 3000
+
+' Main Routine
+
+DO
+  FREQOUT 8, 1, 38500
+  irDetectLeft = IN9
+
+  FREQOUT 2, 1, 38500
+  irDetectRight = IN0
+
+  IF (irDetectLeft = 0) AND (irDetectRight = 0) THEN
+    GOSUB Back_Up ' Both detect obstacle
+    GOSUB Turn_Left ' Back up & U-turn (left twice)
+    GOSUB Turn_Left
+  ELSEIF (irDetectLeft = 0) THEN ' Left detects
+    GOSUB Back_Up ' Back up & turn right
+    GOSUB Turn_Right
+  ELSEIF (irDetectRight = 0) THEN ' Right detects
+    GOSUB Back_Up ' Back up & turn left
+    GOSUB Turn_Left
+  ELSE ' None detect
+    GOSUB Forward_Pulse ' Apply a forward pulse
+  ENDIF ' and check again
+LOOP
+
+' -----[ Subroutines ]--------------------------------------------------------
+Forward_Pulse: ' Send a single forward pulse.
+  PULSOUT 13,850
+  PULSOUT 12,650
+  PAUSE 20
+  RETURN
+
+Turn_Left: ' Left turn, about 90-degrees.
+  FOR pulseCount = 0 TO 20
+    PULSOUT 13, 650
+    PULSOUT 12, 650
+    PAUSE 20
+  NEXT
+  RETURN
+
+Turn_Right:
+  FOR pulseCount = 0 TO 20 ' Right turn, about 90-degrees.
+    PULSOUT 13, 850
+    PULSOUT 12, 850
+    PAUSE 20
+  NEXT
+  RETURN
+
+Back_Up: ' Back up.
+  FOR pulseCount = 0 TO 40
+    PULSOUT 13, 650
+    PULSOUT 12, 850
+    PAUSE 20
+  NEXT
+  RETURN

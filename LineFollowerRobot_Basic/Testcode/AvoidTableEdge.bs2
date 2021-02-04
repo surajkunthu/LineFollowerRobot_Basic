@@ -1,0 +1,51 @@
+' Robotics with the Boe-Bot - AvoidTableEdge.bs2
+' IR detects object edge and navigates to avoid drop-off.
+
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+DEBUG "Program Running!"
+
+irDetectLeft     VAR Bit                  ' Variable declarations.
+irDetectRight    VAR Bit
+pulseLeft        VAR Word
+pulseRight       VAR Word
+loopCount        VAR Byte
+pulseCount       VAR Byte
+
+FREQOUT 4, 2000, 3000                     ' Signal program start/reset.
+
+DO                                        ' Main Routine.
+
+  FREQOUT 8, 1, 38500                     ' Check IR detectors.
+  irDetectLeft = IN9
+  FREQOUT 2, 1, 38500
+  irDetectRight = IN0
+
+                                            ' Decide navigation.
+
+  IF (irDetectLeft = 0) AND (irDetectRight = 0) THEN
+   pulseCount = 1                           ' Both detected,
+   pulseLeft = 850                           ' one pulse forward.
+   pulseRight = 650
+  ELSEIF (irDetectRight = 1) THEN            ' Right not detected,
+    pulseCount = 10                           ' 10 pulses left.
+    pulseLeft = 650
+    pulseRight = 650
+  ELSEIF (irDetectLeft = 1) THEN              ' Left not detected,
+    pulseCount = 10                           ' 10 pulses right.
+    pulseLeft = 850
+    pulseRight = 850
+  ELSE                                          ' Neither detected,
+    pulseCount = 15                             ' back up and try again.
+    pulseLeft = 650
+    pulseRight = 850
+  ENDIF
+
+  FOR loopCount = 1 TO pulseCount               ' Send pulseCount pulses
+    PULSOUT 13,pulseLeft
+    PULSOUT 12,pulseRight
+    PAUSE 20
+  NEXT
+
+LOOP

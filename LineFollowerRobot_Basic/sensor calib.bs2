@@ -1,0 +1,10 @@
+' {$STAMP BS2}                               ' Tells the code compiler which microcontroller is being used
+' {$PBASIC 2.5}                              ' Tells the code compiler which programming language is being used
+
+DEBUG "Program running!"
+
+DO
+  PULSOUT 12, 750
+  PULSOUT 13, 750
+  PAUSE 20
+LOOP

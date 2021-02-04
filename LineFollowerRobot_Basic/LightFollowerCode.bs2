@@ -1,0 +1,47 @@
+' Mechatronics -----
+' Suraj Kunthu
+' GOAL: Navigate test courses utilizing IR detectors and emitters
+
+' {$STAMP BS2}                                      ' Tells the code compiler which microcontroller is being used
+' {$PBASIC 2.5}                                     ' Tells the code compiler which programming language is being used
+
+DEBUG "Program Running!"
+
+'======= Variable Declarations ===================================================================================
+
+irDetectLeft   VAR Bit                              ' Declare variable "irDetectLeft" as a Bit
+irDetectMid    VAR Bit                              ' Declare variable "irDetectMid" as a Bit
+irDetectRight  VAR Bit                              ' Declare variable "irDetectRight' as a Bit
+LeftOffset     VAR Byte                             ' Declare variable "LeftOffset" as a Byte
+RightOffset    VAR Byte                             ' Declare variable "RightOffset" as a Byte
+
+'======= Main Program ============================================================================================
+
+DO                                                  ' Main DO...LOOP
+
+  irDetectLeft = IN6                                ' "irDetectLeft" obtains a binary value from pin 6
+  irDetectMid = IN5                                 ' "irDetectMid" obtains a binary value from pin 5
+  irDetectRight = IN4                               ' "irDetectRight" obtains a binary value from pin 4
+  LeftOffset = 0                                    ' Initialize "LeftOffset" as 0
+  RightOffset = 0                                   ' Initialize "RightOffset" as 0
+
+  DEBUG CRSRXY, 2, 3, BIN1 irDetectLeft,            ' Setup display for binary value found from Bit variables in debug console
+        CRSRXY, 5, 3, BIN1 irDetectMid,
+        CRSRXY, 9, 3, BIN1 irDetectRight
+
+  IF (irDetectRight = 1) THEN                       ' IF the right sensor pair detects an object (black tape)
+    LeftOffset = LeftOffset + 50                    ' THEN increase the left motor by 50 (NOTE: range of 50-70 seems to work the best)
+  ENDIF
+  IF (irDetectLeft = 1) THEN                        ' IF the left sensor pair detects an object (black tape)
+    RightOffset = RightOffset + 50                  ' THEN increase the right motor by 50 (NOTE: range of 50-70 seems to work the best)
+  ENDIF
+  IF (irDetectMid = 1) THEN                         ' IF the middle sensor pair detects an object (black tape)
+    LeftOffset = LeftOffset + 80                    ' THEN increase the both motors by 80 (NOTE: range of 70-100 seems to work the best)
+    RightOffset = RightOffset + 80
+  ENDIF
+
+  PULSOUT 13, 750 + LeftOffset                      ' Send pulse to motor pin 13 with offset adjustment
+  PULSOUT 12, 750 - RightOffset                     ' Send pulse to motor pin 12 with offset adjustment
+  PAUSE 20
+                                                    ' Continue LOOP
+LOOP
